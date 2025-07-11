@@ -21,7 +21,6 @@ export type Proposal = {
   contractNumber: string | null;
   tipo_frete: string| null;
   isArt: Boolean| null;
-  tipo_frete: string | null;
   info_documento: string | null;
   comercial_nome: string | null;
   createdAt: Date;
@@ -112,7 +111,6 @@ export type Family = {
   name: string;
   createdAt: Date;
   updatedAt: Date;
-  models: ModelWithoutRelation[] | null;
 };
 
 export type SystemLog = {
@@ -124,9 +122,6 @@ export type SystemLog = {
   createdAt: string;
 };
 
-logType = 'INFO' | 'WARN' | 'ERROR';
-
-
 export type FleetSap = {
   id: number;
   familia: string;
@@ -134,22 +129,6 @@ export type FleetSap = {
   denominacao: string;
   tipoAt: null | string;
   material: string;
-}
-
-export type Model = {
-    id: string;
-    name: string;
-    familyId: string;
-    createdAt: string;
-    updatedAt: string;
-}
-
-
-export type Family = {
-	id: string;
-  name: string;
-	createdAt: string;
-	updatedAt: string;
 }
 
 
