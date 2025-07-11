@@ -1,0 +1,23 @@
+trigger:
+  branches:
+    include:
+    - 'none'
+  tags:
+    include:
+    - 'none'
+variables:
+  - group: default-variables
+  - group: default-secrets
+  - group: fe-mcc-variables-prd
+resources:
+  repositories:
+  - repository: self
+  - repository: devops
+    name: DevOps/ci_templates
+    ref: main
+    type: git
+pool:
+  vmImage: $(vmImageName)
+stages:
+- template: templates/v1/shared/sonarqube-analysis.yaml@devops
+- template: templates/v1/shared/publish-artifacts-repo-checkout.yaml@devops
