@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@100;200;300;400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100vw;
+  max-width: 100vw;
+  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  overflow-y: scroll;
+  overscroll-behavior: none;
+  color: #202020;
+  scrollbar-color: #f8a675 #fcdac5;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  max-width: 100vw;
+  overflow: auto;
+  overflow-x: hidden;
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: #202020;
+}
+
+#__next {
+  width: 100%;
+  min-height: 100vh;
+  max-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-internal-autofill-previewed,
+input:-webkit-autofill::first-line,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-internal-autofill-previewed,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-internal-autofill-previewed {
+  -webkit-text-fill-color: #4d5163 !important;
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+  box-shadow: 0 0 0px 1000px #fff inset;
+  transition: background-color 5000s ease-in-out 0s;
+  font-size: 16px !important;
+  color: #202020 !important;
+}
+/* Works on Firefox */
+
+* {
+  scrollbar-color: #f8a675 #fcdac5;
+  scrollbar-width: auto;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #fcdac5;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #f8a675;
+  border-radius: 4px;
+}
