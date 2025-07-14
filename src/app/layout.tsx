@@ -7,7 +7,7 @@ import '../styles/globals.css';
 import { Providers } from '@/providers';
 
 export const metadata: Metadata = {
-  title: 'MCC',
+  title: 'RVT',
   description: '',
 };
 

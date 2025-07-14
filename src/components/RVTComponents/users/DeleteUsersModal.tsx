@@ -86,28 +86,17 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
           
           <Box sx={{ mt: 1 }}>
             <Typography variant="body2">
-              <strong>Nome:</strong> {user.nome}
+              <strong>Nome:</strong> {user.name}
             </Typography>
             <Typography variant="body2" sx={{ mt: 0.5 }}>
               <strong>Email:</strong> {user.email}
             </Typography>
             <Typography variant="body2" sx={{ mt: 0.5 }}>
-              <strong>Função:</strong> {user.funcao}
+              <strong>Perfil:</strong> {user.perfilNome}
             </Typography>
             <Typography variant="body2" sx={{ mt: 0.5 }}>
-              <strong>Filial:</strong> {user.filial}
+              <strong>Filial:</strong> {user.filialNome}
             </Typography>
-            <Box sx={{ mt: 1 }}>
-              <Typography variant="body2" component="span" sx={{ mr: 1 }}>
-                <strong>Admin:</strong>
-              </Typography>
-              <Chip 
-                label={user.admin ? 'Sim' : 'Não'} 
-                size="small"
-                color={user.admin ? 'primary' : 'default'}
-                variant={user.admin ? 'filled' : 'outlined'}
-              />
-            </Box>
           </Box>
         </Box>
       </DialogContent>

@@ -5,12 +5,12 @@ import { apiRoutes } from '../router';
 export const userService = {
   createUser: async (userData: UserFormData): Promise<User> => {
     const createRequest: CreateUserRequest = {
-      name: userData.nome,
+      name: userData.name,
       email: userData.email,
       username: userData.username,
       perfilId: userData.perfilId,
       filialId: userData.filialId,
-      ativo: userData.admin, 
+      ativo: userData.ativo, 
     };
 
     return apiRequestWithRoute<User>(apiRoutes.createUser, {}, {}, createRequest);
@@ -20,9 +20,9 @@ export const userService = {
     const queryParams: Record<string, string> = {};
 
     if (filters) {
-      if (filters.nome) queryParams.name = filters.nome;
+      if (filters.name) queryParams.name = filters.name;
       if (filters.email) queryParams.email = filters.email;
-      // if (filters.funcao) queryParams.perfilId = filters.funcao;
+      // if (filters.perfil) queryParams.perfilId = filters.perfil;
       // if (filters.filial) queryParams.filialId = filters.filial;
     }
 
@@ -50,12 +50,12 @@ export const userService = {
   updateUser: async (id: string, userData: UserFormData): Promise<User> => {
     const updateRequest: UpdateUserRequest = {
       id,
-      name: userData.nome,
+      name: userData.name,
       email: userData.email,
       username: userData.username,
       perfilId: userData.perfilId,
       filialId: userData.filialId,
-      ativo: userData.admin, 
+      ativo: userData.ativo, 
     };
 
     return apiRequestWithRoute<User>(apiRoutes.updateUser, { id }, {}, updateRequest);

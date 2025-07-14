@@ -50,6 +50,44 @@ export const apiRoutes = {
     listeHeaders: ['Authorization'],
   },
 
+  ////Filiais
+  getAllFiliais: {
+    method: 'GET',
+    uri: '/filias',
+    listeHeaders: ['Authorization'],
+  },
+
+  getFilialById: {
+    method: 'GET',
+    uri: '/filiais/{id}',
+    listeHeaders: ['Authorization'],
+  },
+
+  getActiveFiliais: {
+    method: 'GET',
+    uri: '/filiais?ativo=true',
+    listeHeaders: ['Authorization'],
+  },
+
+  ////Users_Perfil
+  getAllPerfis: {
+    method: 'GET',
+    uri: '/perfis',
+    listeHeaders: ['Authorization'],
+  },
+
+  getPerfilId: {
+    method: 'GET',
+    uri: '/perfis/{id}',
+    listeHeaders: ['Authorization'],
+  },
+
+  getActivePerfis: {
+    method: 'GET',
+    uri: '/perfis?ativo=true',
+    listeHeaders: ['Authorization'],
+  },
+
   ////Cliente
   createCliente: {
     method: 'POST',

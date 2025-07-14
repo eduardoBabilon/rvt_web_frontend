@@ -30,13 +30,13 @@ export function SideMenuHeader() {
         <div className="flex flex-col w-full h-full gap-4 py-6">
           <div className="flex w-full px-6">
             <Text3 className="flex items-center justify-center min-w-fit w-full whitespace-nowrap text-text-primary">
-              MCC
+              RVT
             </Text3>
           </div>
 
           {/* Botão para Gerar Etiqueta (Home) */}
           <ButtonSideMenu
-            text="MCC"
+            text="RVT"
             onClick={navigateToHome}
             isSelected={pathname === '/'}
           />

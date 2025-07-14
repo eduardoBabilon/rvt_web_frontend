@@ -3,7 +3,7 @@ import { apiRequest } from '../api';
 
 export const perfilService = {
   getAllPerfis: async (): Promise<PerfilResponse> => {
-    const perfis = await apiRequest<Perfil[]>('/perfil', {
+    const perfis = await apiRequest<Perfil[]>('/perfis', {
       method: 'GET',
     });
 

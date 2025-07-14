@@ -41,12 +41,12 @@ export const UserModal: React.FC<UserModalProps> = ({
   loading = false
 }) => {
   const [formData, setFormData] = useState<UserFormData>({
-    nome: '',
+    name: '',
     email: '',
     username: '',
     perfilId: '',
     filialId: '',
-    admin: false
+    ativo: true,
   });
 
   const [errors, setErrors] = useState<UserFormErrors>({});
@@ -65,21 +65,21 @@ export const UserModal: React.FC<UserModalProps> = ({
   useEffect(() => {
     if (mode === 'edit' && user) {
       setFormData({
-        nome: user.nome,
+        name: user.name,
         email: user.email,
         username: user.username,
         perfilId: '', 
         filialId: '', 
-        admin: user.admin
+        ativo: user.ativo
       });
     } else {
       setFormData({
-        nome: '',
+        name: '',
         email: '',
         username: '',
         perfilId: '',
         filialId: '',
-        admin: false
+        ativo: true
       });
     }
     setErrors({});
@@ -100,8 +100,8 @@ export const UserModal: React.FC<UserModalProps> = ({
       setFiliais(filiaisResponse.data);
 
       if (mode === 'edit' && user) {
-        const perfilEncontrado = perfisResponse.data.find(p => p.perfil === user.funcao);
-        const filialEncontrada = filiaisResponse.data.find(f => f.nome === user.filial);
+        const perfilEncontrado = perfisResponse.data.find(p => p.perfil === user.perfilNome);
+        const filialEncontrada = filiaisResponse.data.find(f => f.name === user.filialNome);
 
         setFormData(prev => ({
           ...prev,
@@ -120,8 +120,8 @@ export const UserModal: React.FC<UserModalProps> = ({
   const validateForm = (): boolean => {
     const newErrors: UserFormErrors = {};
 
-    if (!formData.nome.trim()) {
-      newErrors.nome = 'Nome é obrigatório';
+    if (!formData.name.trim()) {
+      newErrors.name = 'Nome é obrigatório';
     }
 
     if (!formData.email.trim()) {
@@ -210,10 +210,10 @@ export const UserModal: React.FC<UserModalProps> = ({
             <TextField
               fullWidth
               label="Nome"
-              value={formData.nome}
-              onChange={(e) => handleInputChange('nome', e.target.value)}
-              error={!!errors.nome}
-              helperText={errors.nome}
+              value={formData.name}
+              onChange={(e) => handleInputChange('name', e.target.value)}
+              error={!!errors.name}
+              helperText={errors.name}
               disabled={loading}
               required
               sx={{ mb: 2 }}
@@ -285,7 +285,7 @@ export const UserModal: React.FC<UserModalProps> = ({
               >
                 {filiais.map((filial) => (
                   <MenuItem key={filial.id} value={filial.id}>
-                    {filial.nome}
+                    {filial.name}
                   </MenuItem>
                 ))}
               </Select>
@@ -295,18 +295,6 @@ export const UserModal: React.FC<UserModalProps> = ({
                 </Typography>
               )}
             </FormControl>
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={formData.admin}
-                  onChange={(e) => handleInputChange('admin', e.target.checked)}
-                  disabled={loading}
-                  color="primary"
-                />
-              }
-              label="Administrador"
-            />
           </Box>
         )}
       </DialogContent>

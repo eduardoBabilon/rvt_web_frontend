@@ -49,7 +49,7 @@ export default function Page (){
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'nome', direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'name', direction: 'asc' });
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalElements, setTotalElements] = useState(0);
@@ -78,7 +78,7 @@ export default function Page (){
 
       const filters: UserFilters = {};
       if (searchTerm.trim()) {
-        filters.nome = searchTerm.trim();
+        filters.name = searchTerm.trim();
       }
 
       const pagination: PaginationParams = {
@@ -290,12 +290,12 @@ export default function Page (){
                 </TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={sortConfig.field === 'nome'}
-                    direction={sortConfig.field === 'nome' ? sortConfig.direction : 'asc'}
-                    onClick={() => handleSort('nome')}
+                    active={sortConfig.field === 'name'}
+                    direction={sortConfig.field === 'name' ? sortConfig.direction : 'asc'}
+                    onClick={() => handleSort('name')}
                   >
                     Nome
-                    {renderSortIcon('nome')}
+                    {renderSortIcon('name')}
                   </TableSortLabel>
                 </TableCell>
                 <TableCell>
@@ -308,9 +308,8 @@ export default function Page (){
                     {renderSortIcon('email')}
                   </TableSortLabel>
                 </TableCell>
-                <TableCell>Função</TableCell>
+                <TableCell>Perfil</TableCell>
                 <TableCell>Filial</TableCell>
-                <TableCell>Admin</TableCell>
                 <TableCell>
                   <TableSortLabel
                     active={sortConfig.field === 'criadoEm'}
@@ -360,18 +359,10 @@ export default function Page (){
                         {user.id.substring(0, 8)}...
                       </Typography>
                     </TableCell>
-                    <TableCell>{user.nome}</TableCell>
+                    <TableCell>{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.funcao}</TableCell>
-                    <TableCell>{user.filial}</TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={user.admin ? 'Sim' : 'Não'} 
-                        size="small"
-                        color={user.admin ? 'primary' : 'default'}
-                        variant={user.admin ? 'filled' : 'outlined'}
-                      />
-                    </TableCell>
+                    <TableCell>{user.perfilNome}</TableCell>
+                    <TableCell>{user.filialNome}</TableCell>
                     <TableCell>
                       <Typography variant="body2">
                         {new Date(user.criadoEm).toLocaleDateString('pt-BR')}
