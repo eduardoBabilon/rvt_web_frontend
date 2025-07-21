@@ -1,4 +1,4 @@
-import { User } from '@/@types/entities';
+import { User } from '@/types/entities';
 
 export type AuthContextData = {
   user: User | null;

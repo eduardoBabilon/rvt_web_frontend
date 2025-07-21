@@ -1,4 +1,4 @@
-import { Perfil, PerfilResponse } from '@/@types/modules/users';
+import { Perfil, PerfilResponse } from '@/types/modules/users';
 import { apiRequest } from '../api';
 
 export const perfilService = {

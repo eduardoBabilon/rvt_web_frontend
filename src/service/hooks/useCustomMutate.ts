@@ -2,7 +2,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query';
 import useAxiosUtils from '@/utils/axios/hooks/useAxiosUtils';
 import { useMiddleware } from '../middleware/useMiddleware';
 import { AxiosError, AxiosRequestConfig } from 'axios';
-import { MutateOptions } from '@/@types/reactQuery';
+import { MutateOptions } from '@/types/reactQuery';
 import { Params, RoutesName } from '../types';
 
 export type CustomMutationProps<T = any> = {

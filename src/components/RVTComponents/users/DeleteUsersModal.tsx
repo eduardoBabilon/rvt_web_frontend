@@ -12,7 +12,7 @@ import {
   IconButton
 } from '@mui/material';
 import { Warning, Close } from '@mui/icons-material';
-import { User } from '@/@types/modules/users'
+import { User } from '@/types/modules/users'
 
 interface DeleteUserModalProps {
   isOpen: boolean;

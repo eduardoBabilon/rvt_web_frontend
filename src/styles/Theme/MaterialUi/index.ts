@@ -13,6 +13,26 @@ export const theme = createTheme(
       fontFamily: ['IBM Plex Sans', 'Roboto', 'Arial', 'sans-serif'].join(','),
     },
     palette: {
+      mode: 'light',
+      primary: {
+        main: colors.brand.primary,
+        light: colors.brand.primaryLight,
+        contrastText: colors.brand.white,
+      },
+      secondary: {
+        main: colors.brand.secondary,
+      },
+      error: {
+        main: colors.alerts.red,
+      },
+      text: {
+        primary: colors.text.primary,
+        secondary: colors.text.light,
+      },
+      background: {
+        default: colors.background.brandLight,
+        paper: colors.background.primary,
+      },
       custom: colors,
     },
     breakpoints: {
@@ -76,3 +96,6 @@ export const theme = createTheme(
   },
   ptBR,
 );
+
+export default theme;
+

@@ -1,4 +1,4 @@
-import { Filial, FilialResponse } from '@/@types/modules/users';
+import { Filial, FilialResponse } from '@/types/modules/users';
 import { apiRequest } from '../api';
 
 export const filialService = {

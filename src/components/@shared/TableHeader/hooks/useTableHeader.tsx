@@ -1,5 +1,5 @@
 import { ComponentProps, useEffect, useState } from 'react';
-import { ColumnTableConfig } from '@/@types/table';
+import { ColumnTableConfig } from '@/types/table';
 import { SortDirection } from '@/utils/types';
 import { TableHeader } from '..';
 

@@ -1,4 +1,4 @@
-import { User, userRole } from "@/@types/entities";
+import { User, userRole } from "@/types/entities";
 
 export type GetUserData = User & {
   createdAt: string;

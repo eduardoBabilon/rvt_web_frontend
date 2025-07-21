@@ -19,9 +19,9 @@ import {
   Alert
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { User, UserFormData, UserFormErrors, Perfil, Filial } from '@/@types/modules/users';
-import { perfilService } from '@/service/users/perfilService';
-import { filialService } from '@/service/users/filialService';
+import { User, UserFormData, UserFormErrors, Perfil, Filial } from '@/types/modules/users';
+import { perfilService } from '@/service/api/users/perfilService';
+import { filialService } from '@/service/api/users/filialService';
 
 interface UserModalProps {
   isOpen: boolean;

@@ -1,6 +1,6 @@
 import { useMiddleware } from '../middleware/useMiddleware';
 import { CustomAxiosError } from '@/utils/axios/types';
-import { QueryOptions } from '@/@types/reactQuery';
+import { QueryOptions } from '@/types/reactQuery';
 import { useQuery } from '@tanstack/react-query';
 import { Params, RoutesName } from '../types';
 import { baseUrl } from '@/constants/service';

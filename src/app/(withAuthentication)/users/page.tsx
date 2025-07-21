@@ -32,8 +32,8 @@ import {
   ArrowUpward,
   ArrowDownward
 } from '@mui/icons-material';
-import { User, UserFormData, UserFilters, PaginationParams, UserPagedResponse } from '@/@types/modules/users';
-import { userService } from '@/service/users/userService';
+import { User, UserFormData, UserFilters, PaginationParams, UserPagedResponse } from '@/types/modules/users';
+import { userService } from '@/service/api/users/userService';
 import { UserModal } from '@/components/RVTComponents/users/UsersModal';
 import { DeleteUserModal } from '@/components/RVTComponents/users/DeleteUsersModal';
 
@@ -312,22 +312,22 @@ export default function Page (){
                 <TableCell>Filial</TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={sortConfig.field === 'criadoEm'}
-                    direction={sortConfig.field === 'criadoEm' ? sortConfig.direction : 'asc'}
-                    onClick={() => handleSort('criadoEm')}
+                    active={sortConfig.field === 'created_at'}
+                    direction={sortConfig.field === 'created_at' ? sortConfig.direction : 'asc'}
+                    onClick={() => handleSort('created_at')}
                   >
                     Criado em
-                    {renderSortIcon('criadoEm')}
+                    {renderSortIcon('created_at')}
                   </TableSortLabel>
                 </TableCell>
                 <TableCell>
                   <TableSortLabel
-                    active={sortConfig.field === 'atualizadoEm'}
-                    direction={sortConfig.field === 'atualizadoEm' ? sortConfig.direction : 'asc'}
-                    onClick={() => handleSort('atualizadoEm')}
+                    active={sortConfig.field === 'updated_at'}
+                    direction={sortConfig.field === 'updated_at' ? sortConfig.direction : 'asc'}
+                    onClick={() => handleSort('updated_at')}
                   >
                     Atualizado em
-                    {renderSortIcon('atualizadoEm')}
+                    {renderSortIcon('updated_at')}
                   </TableSortLabel>
                 </TableCell>
                 <TableCell align="center">Ações</TableCell>
@@ -365,12 +365,12 @@ export default function Page (){
                     <TableCell>{user.filialNome}</TableCell>
                     <TableCell>
                       <Typography variant="body2">
-                        {new Date(user.criadoEm).toLocaleDateString('pt-BR')}
+                        {new Date(user.created_at).toLocaleDateString('pt-BR')}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">
-                        {new Date(user.atualizadoEm).toLocaleDateString('pt-BR')}
+                        {new Date(user.updated_at).toLocaleDateString('pt-BR')}
                       </Typography>
                     </TableCell>
                     <TableCell align="center">

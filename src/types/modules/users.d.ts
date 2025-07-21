@@ -6,8 +6,8 @@ export interface User {
   perfilNome: string;
   filialNome: string;
   ativo: boolean;
-  criadoEm: string;
-  atualizadoEm: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CreateUserRequest {

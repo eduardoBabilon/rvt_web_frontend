@@ -11,223 +11,223 @@ export const apiRoutes = {
   createUser: {
     method: 'POST',
     uri: '/users',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getAllUsers: {
     method: 'GET',
     uri: '/users',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
   
   getUserById: {
     method: 'GET',
     uri: '/users/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getUserByEmail: {
     method: 'GET',
     uri: '/users/email/{email}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getUserByUsername: {
     method: 'GET',
     uri: '/users/username/{username}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   updateUser: {
     method: 'PUT',
     uri: '/users/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   deleteUser: {
     method: 'DELETE',
     uri: '/users/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   ////Filiais
   getAllFiliais: {
     method: 'GET',
     uri: '/filias',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getFilialById: {
     method: 'GET',
     uri: '/filiais/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getActiveFiliais: {
     method: 'GET',
     uri: '/filiais?ativo=true',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   ////Users_Perfil
   getAllPerfis: {
     method: 'GET',
     uri: '/perfis',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getPerfilId: {
     method: 'GET',
     uri: '/perfis/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getActivePerfis: {
     method: 'GET',
     uri: '/perfis?ativo=true',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   ////Cliente
   createCliente: {
     method: 'POST',
     uri: '/clientes',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getAllClientes: {
     method: 'GET',
     uri: '/clientes',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getClienteById: {
     method: 'GET',
     uri: '/clientes/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   updateCliente: {
     method: 'PUT',
     uri: '/clientes/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   deleteCliente: {
     method: 'DELETE',
     uri: '/clientes/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   ////Contratos
   createContrato: {
     method: 'POST',
     uri: '/contratos',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getAllContratos: {
     method: 'GET',
     uri: '/contratos',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getContratoById: {
     method: 'GET',
     uri: '/contratos/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getContratoByCliente: {
     method: 'GET',
     uri: '/contratos/cliente/{clienteId}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   updateContrato: {
     method: 'PUT',
     uri: '/contratos/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   deleteContrato: {
     method: 'DELETE',
     uri: '/contratos/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   ////Obras
   createObra: {
     method: 'POST',
     uri: '/obras',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getAllObras: {
     method: 'GET',
     uri: '/obras',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getObraById: {
     method: 'GET',
     uri: '/obras/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getObraByFilial: {
     method: 'GET',
     uri: '/obras/filial/{filialId}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   updateObra: {
     method: 'PUT',
     uri: '/obras/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   deleteObra: {
     method: 'DELETE',
     uri: '/obras/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   ////Etapas de Obras
   createObraEtapa: {
     method: 'POST',
     uri: '/obra-etapas',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getAllObraEtapas: {
     method: 'GET',
     uri: '/obra-etapas',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getObraEtapaById: {
     method: 'GET',
     uri: '/obra-etapas/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   getObraEtapaByObra: {
     method: 'GET',
     uri: '/obra-ertapas/obra/{obraId}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   updateObraEtapa: {
     method: 'PUT',
     uri: '/obra-etapas/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   deleteObraEtapa: {
     method: 'DELETE',
     uri: '/obra-etapas/{id}',
-    listeHeaders: ['Authorization'],
+    listenHeaders: ['Authorization'],
   },
 
   // MCC ROUTES

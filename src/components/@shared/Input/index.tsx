@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 
 import { RegisterOptions } from 'react-hook-form';
-import { ErrorHookForm, ErrorsHookForm } from '@/@types/hookForm';
+import { ErrorHookForm, ErrorsHookForm } from '@/types/hookForm';
 import { iterateObject } from '@/utils/functions/object';
 import { Controller } from 'react-hook-form';
 import { ConnectForm } from '../ConnectForm';

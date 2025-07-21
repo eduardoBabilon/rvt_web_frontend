@@ -4,7 +4,7 @@ import { TableCell, TableHead, TableRow } from '@mui/material';
 import { TableMorePopover } from '../TableMorePopover';
 import { useTableHeader } from './hooks/useTableHeader';
 import { GridMoreVertIcon } from '@mui/x-data-grid';
-import { ColumnTableConfig } from '@/@types/table';
+import { ColumnTableConfig } from '@/types/table';
 import { ArrowUpDown } from '../ArrowUpDown';
 import { Text6 } from '../Texts';
 import { When } from '../When';

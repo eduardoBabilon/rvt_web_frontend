@@ -5,7 +5,7 @@ import { useAuthServices } from './hooks/useAuthServices';
 import { useSnackbarContext } from '../Snackbar';
 import { requestConfig } from '@/authConfig';
 import { AuthContextData } from './types';
-import { User } from '@/@types/entities';
+import { User } from '@/types/entities';
 import {
   InteractionRequiredAuthErrorCodes,
   InteractionRequiredAuthError,

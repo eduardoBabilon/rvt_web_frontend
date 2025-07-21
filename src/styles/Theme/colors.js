@@ -1,8 +1,8 @@
 const { lighten, darken } = require('polished');
 
 const primaryColor = '#F37021';
-const primaryLightColor = '#48A1B0';
-const secondaryColor = '#FFCB05';
+const primaryLightColor = '#E7E6E6';
+const secondaryColor = '#C24003';
 const whiteColor = '#FFFFFF';
 
 module.exports = {
@@ -27,8 +27,8 @@ module.exports = {
     gold: '#E39703',
   },
   background: {
-    blueLight: '#36A1AC1A',
-    brandLight: '#F370211A',
+    primary: '#FFFFFF',
+    brandLight: '#E7E6E6',
     yellowLight: '#FEE27833',
   },
   divider: { green: '#3AC658' },

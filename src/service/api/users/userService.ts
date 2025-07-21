@@ -1,6 +1,6 @@
-import { User, CreateUserRequest, UpdateUserRequest, UserFormData, UserPagedResponse, UserFilters, PaginationParams } from '@/@types/modules/users';
+import { User, CreateUserRequest, UpdateUserRequest, UserFormData, UserPagedResponse, UserFilters, PaginationParams } from '@/types/modules/users';
 import { apiRequestWithRoute } from '../api';
-import { apiRoutes } from '../router';
+import { apiRoutes } from '../../router';
 
 export const userService = {
   createUser: async (userData: UserFormData): Promise<User> => {
