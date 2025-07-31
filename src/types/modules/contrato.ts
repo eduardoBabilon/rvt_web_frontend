@@ -1,3 +1,4 @@
+
 export interface Contrato {
   id: string;
   numero_contrato: string;

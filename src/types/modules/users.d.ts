@@ -3,8 +3,8 @@ export interface User {
   name: string;
   email: string;
   username: string;
-  perfilNome: string;
-  filialNome: string;
+  perfil_nome: string;
+  filial_nome: string;
   ativo: boolean;
   created_at: string;
   updated_at: string;
@@ -14,8 +14,8 @@ export interface CreateUserRequest {
   name: string; 
   email: string;
   username: string;
-  perfilId: string; 
-  filialId: string;
+  perfil_id: string; 
+  filial_id: string;
   ativo: boolean; 
 }
 
@@ -24,8 +24,8 @@ export interface UpdateUserRequest {
   name?: string; 
   email?: string;
   username?: string;
-  perfilId?: string; 
-  filialId?: string; 
+  perfil_id?: string; 
+  filial_id?: string; 
   ativo?: boolean; 
 }
 
@@ -80,8 +80,8 @@ export interface UserFormData {
   name: string;
   email: string;
   username: string;
-  perfilId: string; 
-  filialId: string; 
+  perfil_id: string; 
+  filial_id: string; 
   ativo: boolean;
 }
 
@@ -89,8 +89,8 @@ export interface UserFormErrors {
   name?: string;
   email?: string;
   username?: string;
-  perfilId?: string;
-  filialId?: string;
+  perfil_id?: string;
+  filial_id?: string;
 }
 
 export interface PerfilResponse {

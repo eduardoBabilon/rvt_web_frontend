@@ -14,37 +14,10 @@ export const getAllContratos = async (): Promise<Contrato[]> => {
     const response = await apiRequest<ContratoPagedResponse>('/contratos', {
       method: 'GET'
     });
-    // Se o backend retornar paginação, extrair o content
-    if (response && typeof response === 'object' && 'content' in response) {
-      return response.content;
-    }
-    // Se retornar array direto
-    return response as unknown as Contrato[];
+    console.log("contratos response:", response);
+    return response.content;
   } catch (error) {
     console.error('Erro ao buscar contratos:', error);
-    throw error;
-  }
-};
-
-// Função para buscar contratos com paginação
-export const getContratosPaginated = async (
-  page: number = 0,
-  size: number = 20,
-  sort: string = 'numero_contrato,asc'
-): Promise<ContratoPagedResponse> => {
-  try {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      size: size.toString(),
-      sort: sort
-    });
-
-    const response = await apiRequest<ContratoPagedResponse>(`/contratos?${params}`, {
-      method: 'GET'
-    });
-    return response;
-  } catch (error) {
-    console.error('Erro ao buscar contratos paginados:', error);
     throw error;
   }
 };

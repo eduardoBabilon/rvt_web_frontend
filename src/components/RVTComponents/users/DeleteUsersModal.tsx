@@ -92,10 +92,10 @@ export const DeleteUserModal: React.FC<DeleteUserModalProps> = ({
               <strong>Email:</strong> {user.email}
             </Typography>
             <Typography variant="body2" sx={{ mt: 0.5 }}>
-              <strong>Perfil:</strong> {user.perfilNome}
+              <strong>Perfil:</strong> {user.perfil_nome}
             </Typography>
             <Typography variant="body2" sx={{ mt: 0.5 }}>
-              <strong>Filial:</strong> {user.filialNome}
+              <strong>Filial:</strong> {user.filial_nome}
             </Typography>
           </Box>
         </Box>

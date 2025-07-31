@@ -15,7 +15,7 @@ export interface CreateClienteEmpresaRequest {
   cnpj: string;
   contato_nome?: string;
   contato_telefone?: string;
-  email: string;
+  email?: string;
 }
 
 export interface UpdateClienteEmpresaRequest {
@@ -27,6 +27,27 @@ export interface UpdateClienteEmpresaRequest {
   ativo?: boolean;
 }
 
+export interface ImportacaoLoteRequest {
+  clientes: CreateClienteEmpresaRequest[];
+}
+
+export interface ImportacaoLoteResponse {
+  sucessos: ClienteEmpresa[];
+  erros: {
+    cliente: CreateClienteEmpresaRequest;
+    cnpj: string;
+    erro: string;
+  }[];
+  total_processados: number;
+  total_sucessos: number;
+  total_erros: number;
+}
+
+export interface ProgressCallback {
+  (progresso: number): void;
+}
+
+
 export interface ClienteEmpresaFormData {
   nome_empresa: string;
   cnpj: string;
@@ -35,7 +56,7 @@ export interface ClienteEmpresaFormData {
   email: string;
 }
 
-// Tipos para paginação (caso seja implementada no backend futuramente)
+// Tipos para paginação 
 export interface ClienteEmpresaResponse {
   content: ClienteEmpresa[];
   totalElements: number;
@@ -52,6 +73,7 @@ export interface ClienteEmpresaFilters {
   cnpj?: string;
   email?: string;
   ativo?: boolean;
+  searchTerm?: string;
 }
 
 // Tipos para ordenação
@@ -95,6 +117,47 @@ export interface CadastroClienteProps {
   onSuccess?: (cliente: ClienteEmpresa) => void;
   onCancel?: () => void;
 }
+
+interface ValidateCNPJResult {
+  valid: boolean;
+  error?: string;
+}
+
+export const validateCNPJFormat = (cnpj: string): ValidateCNPJResult => {
+  const numbers = cnpj.replace(/\D/g, '');
+
+  if (numbers.length !== 14) {
+    return { valid: false, error: 'CNPJ deve conter 14 dígitos.' };
+  }
+
+  if (/^(\d)\1{13}$/.test(numbers)) {
+    return { valid: false, error: 'CNPJ inválido: sequência repetida.' };
+  }
+
+  const calculateDigit = (numbers: string, weights: number[]): number => {
+    let sum = 0;
+    for (let i = 0; i < weights.length; i++) {
+      sum += parseInt(numbers.charAt(i), 10) * weights[i];
+    }
+    const remainder = sum % 11;
+    return remainder < 2 ? 0 : 11 - remainder;
+  };
+
+  const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+
+  const digit1 = calculateDigit(numbers, weights1);
+  if (digit1 !== parseInt(numbers.charAt(12), 10)) {
+    return { valid: false, error: 'Primeiro dígito verificador inválido.' };
+  }
+
+  const digit2 = calculateDigit(numbers, weights2);
+  if (digit2 !== parseInt(numbers.charAt(13), 10)) {
+    return { valid: false, error: 'Segundo dígito verificador inválido.' };
+  }
+
+  return { valid: true };
+};
 
 export const CLIENTE_EMPRESA_VALIDATION = {
   NOME_EMPRESA: {

@@ -1,28 +1,34 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Paper,
   Typography,
-  TextField,
   Button,
+  Card,
+  CardContent,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  TablePagination,
-  TableSortLabel,
+  Paper,
   IconButton,
   Chip,
-  CircularProgress,
-  Alert,
+  TextField,
   InputAdornment,
+  Grid,
+  Alert,
   Tooltip,
-  Card,
-  CardContent
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Breadcrumbs,
+  Link,
+  TablePagination
 } from '@mui/material';
 import {
   Add,
@@ -30,550 +36,565 @@ import {
   Edit,
   Delete,
   Business,
-  Email,
   Phone,
-  Person
+  Email,
+  Home,
+  CheckCircle,
+  ContactPage,
+  Cancel,
+  MoreVert,
+  CloudUpload,
+  FileDownload,
+  Visibility,
+  Refresh
 } from '@mui/icons-material';
 import { 
-  ClienteEmpresa, 
-  ClienteEmpresaFormData, 
-  ClienteEmpresaFilters,
-  CentralClientesProps 
+  ClienteEmpresa,
+  CreateClienteEmpresaRequest,
+  formatCNPJ,
+  formatTelefone
 } from '@/types/modules/clienteEmpresa';
 import { 
   getAllClientes, 
-  getClientesWithFilters, 
+  deleteCliente, 
   createCliente, 
-  updateCliente, 
-  deleteCliente,
-  getClientesStats,
-  cleanClienteEmpresaFormData
+  updateCliente,
+  getClientesStats
 } from '@/service/api/clienteEmpresa/clienteEmpresaService';
-import  ClienteEmpresaModal  from '@/components/RVTComponents/clienteEmpresa/ClienteEmpresaModal';
-import  DeleteClienteEmpresaModal  from '@/components/RVTComponents/clienteEmpresa/DeleteClienteEmpresaModal';
+import ClienteEmpresaModal from '@/components/RVTComponents/clienteEmpresa/ClienteEmpresaModal';
+import DeleteClienteEmpresaModal from '@/components/RVTComponents/clienteEmpresa/DeleteClienteEmpresaModal';
+import ImportacaoClientesModal from '@/components/RVTComponents/clienteEmpresa/ImportClientesModal';
+import { useRouter } from 'next/navigation';
 
-type SortDirection = 'asc' | 'desc';
-
-interface SortConfig {
-  field: string;
-  direction: SortDirection;
+interface CentralClientesProps {
+  userRole?: string;
 }
 
-export default function CentralClientes(){
+const CentralClientes: React.FC<CentralClientesProps> = () => {
+  // Estados
   const [clientes, setClientes] = useState<ClienteEmpresa[]>([]);
-  const [filteredClientes, setFilteredClientes] = useState<ClienteEmpresa[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'nome_empresa', direction: 'asc' });
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalElements, setTotalElements] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Estados para paginação
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  // Estados para modais
-  const [modalOpen, setModalOpen] = useState(false);
+  // Estados dos modais
+  const [clienteModalOpen, setClienteModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [importacaoModalOpen, setImportacaoModalOpen] = useState(false);
   const [selectedCliente, setSelectedCliente] = useState<ClienteEmpresa | null>(null);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
 
-  // Estados para estatísticas
+  // Estados do menu de ações
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuClienteId, setMenuClienteId] = useState<string | null>(null);
+
+  // Estados das estatísticas
   const [stats, setStats] = useState({
     total: 0,
     ativos: 0,
-    inativos: 0
+    inativos: 0,
+    recentes: 0
   });
 
+  const router = useRouter();
+
+  // Carregar dados iniciais
+  useEffect(() => {
+    loadClientes();
+    loadStats();
+  }, [page, rowsPerPage, searchTerm]);
+
   // Função para carregar clientes
-  const loadClientes = useCallback(async () => {
+  const loadClientes = async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      const clientesData = await getAllClientes();
-      setClientes(clientesData);
-      setFilteredClientes(clientesData);
-      
-      // Carregar estatísticas
+
+      const filters = searchTerm.trim()
+        ? { searchTerm }
+        : {};
+
+      const response = await getAllClientes(page, rowsPerPage, filters);
+      setClientes(response.content);
+      setTotalElements(response.totalElements);
+    } catch (error: any) {
+      console.error('Erro ao carregar clientes:', error);
+      setError('Erro ao carregar clientes. Tente novamente.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // Função para carregar estatísticas
+  const loadStats = async () => {
+    try {
       const statsData = await getClientesStats();
       setStats({
         total: statsData.total,
         ativos: statsData.ativos,
-        inativos: statsData.inativos
+        inativos: statsData.inativos,
+        recentes: statsData.ultimosCadastrados.length
       });
-      
-    } catch (err) {
-      console.error('Erro ao carregar clientes:', err);
-      setError('Erro ao carregar lista de clientes. Tente novamente.');
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Erro ao carregar estatísticas:', error);
     }
-  }, []);
-
-  // Carregar dados na inicialização
-  useEffect(() => {
-    loadClientes();
-  }, [loadClientes]);
-
-  // Função para aplicar filtros e busca
-  const applyFilters = useCallback(async () => {
-    try {
-      const filters: ClienteEmpresaFilters = {};
-      
-      if (searchTerm.trim()) {
-        // Verificar se é busca por CNPJ, email ou nome
-        if (searchTerm.includes('@')) {
-          filters.email = searchTerm.trim();
-        } else if (searchTerm.replace(/\D/g, '').length >= 11) {
-          filters.cnpj = searchTerm.replace(/\D/g, '');
-        } else {
-          filters.nome_empresa = searchTerm.trim();
-        }
-      }
-
-      const sortString = `${sortConfig.field},${sortConfig.direction}`;
-      const filtered = await getClientesWithFilters(filters, page, rowsPerPage, sortString);
-      setFilteredClientes(filtered);
-      
-    } catch (err) {
-      console.error('Erro ao aplicar filtros:', err);
-      setError('Erro ao filtrar clientes. Tente novamente.');
-    }
-  }, [searchTerm, sortConfig, page, rowsPerPage]);
-
-  // Aplicar filtros quando houver mudanças
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      applyFilters();
-    }, 500); // Debounce de 500ms
-
-    return () => clearTimeout(timeoutId);
-  }, [applyFilters]);
-
-  // Função para ordenação
-  const handleSort = (field: string) => {
-    const newDirection: SortDirection = 
-      sortConfig.field === field && sortConfig.direction === 'asc' ? 'desc' : 'asc';
-    
-    setSortConfig({ field, direction: newDirection });
   };
 
-  // Função para mudança de página
+
+  //handlers de paginação
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  // Função para mudança de linhas por página
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
   // Função para abrir modal de criação
-  const handleCreate = () => {
+  const handleCreateCliente = () => {
     setSelectedCliente(null);
     setModalMode('create');
-    setModalOpen(true);
+    setClienteModalOpen(true);
   };
 
   // Função para abrir modal de edição
-  const handleEdit = (cliente: ClienteEmpresa) => {
+  const handleEditCliente = (cliente: ClienteEmpresa) => {
     setSelectedCliente(cliente);
     setModalMode('edit');
-    setModalOpen(true);
+    setClienteModalOpen(true);
+    handleCloseMenu();
   };
 
   // Função para abrir modal de exclusão
-  const handleDelete = (cliente: ClienteEmpresa) => {
+  const handleDeleteCliente = (cliente: ClienteEmpresa) => {
     setSelectedCliente(cliente);
     setDeleteModalOpen(true);
+    handleCloseMenu();
   };
 
   // Função para salvar cliente (criar ou editar)
-  const handleSave = async (formData: ClienteEmpresaFormData) => {
+  const handleSaveCliente = async (data: CreateClienteEmpresaRequest) => {
     try {
-      setActionLoading(true);
+      setLoading(true);
       setError(null);
 
-      const cleanData = cleanClienteEmpresaFormData(formData);
-
       if (modalMode === 'create') {
-        await createCliente(cleanData);
+        await createCliente(data);
         setSuccess('Cliente criado com sucesso!');
       } else if (selectedCliente) {
-        await updateCliente(selectedCliente.id, cleanData);
+        await updateCliente(selectedCliente.id, data);
         setSuccess('Cliente atualizado com sucesso!');
       }
 
-      setModalOpen(false);
-      setSelectedCliente(null);
+      setClienteModalOpen(false);
       await loadClientes();
-      
-    } catch (err: any) {
-      console.error('Erro ao salvar cliente:', err);
-      
-      // Tratar erros específicos do backend
-      if (err.message?.includes('CNPJ já cadastrado')) {
-        setError('CNPJ já está cadastrado para outro cliente.');
-      } else if (err.message?.includes('Email já cadastrado')) {
-        setError('Email já está cadastrado para outro cliente.');
-      } else {
-        setError('Erro ao salvar cliente. Verifique os dados e tente novamente.');
-      }
+      await loadStats();
+    } catch (error: any) {
+      console.error('Erro ao salvar cliente:', error);
+      setError(error.message || 'Erro ao salvar cliente. Tente novamente.');
     } finally {
-      setActionLoading(false);
+      setLoading(false);
     }
   };
 
   // Função para confirmar exclusão
   const handleConfirmDelete = async (id: string) => {
     try {
-      setActionLoading(true);
+      setLoading(true);
       setError(null);
-
       await deleteCliente(id);
       setSuccess('Cliente excluído com sucesso!');
       setDeleteModalOpen(false);
-      setSelectedCliente(null);
       await loadClientes();
-      
-    } catch (err) {
-      console.error('Erro ao excluir cliente:', err);
-      setError('Erro ao excluir cliente. Tente novamente.');
+      await loadStats();
+    } catch (error: any) {
+      console.error('Erro ao excluir cliente:', error);
+      setError(error.message || 'Erro ao excluir cliente. Tente novamente.');
     } finally {
-      setActionLoading(false);
+      setLoading(false);
     }
   };
 
-  // Função para fechar alertas
-  const handleCloseAlert = () => {
+  // Função para abrir modal de importação
+  const handleImportacao = () => {
+    setImportacaoModalOpen(true);
+  };
+
+  // Função para sucesso da importação
+  const handleImportacaoSuccess = async (clientesImportados: ClienteEmpresa[]) => {
+    setSuccess(`${clientesImportados.length} cliente(s) importado(s) com sucesso!`);
+    setImportacaoModalOpen(false);
+    await loadClientes();
+    await loadStats();
+  };
+
+  // Funções do menu de ações
+  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>, clienteId: string) => {
+    setAnchorEl(event.currentTarget);
+    setMenuClienteId(clienteId);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+    setMenuClienteId(null);
+  };
+
+  // Função para limpar mensagens
+  const clearMessages = () => {
     setError(null);
     setSuccess(null);
   };
 
-  // Função para formatar CNPJ
-  const formatCNPJ = (cnpj: string) => {
-    const numbers = cnpj.replace(/\D/g, '');
-    if (numbers.length !== 14) return cnpj;
-    return numbers.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
-  };
-
-  // Função para formatar telefone
-  const formatTelefone = (telefone: string) => {
-    if (!telefone) return '-';
-    const numbers = telefone.replace(/\D/g, '');
-    if (numbers.length === 10) {
-      return numbers.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
-    } else if (numbers.length === 11) {
-      return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-    }
-    return telefone;
-  };
-
   // Função para formatar data
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return new Date(dateString).toLocaleDateString('pt-BR');
   };
 
-  // Calcular dados paginados
-  const paginatedClientes = filteredClientes.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-
-  if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress size={40} />
-      </Box>
-    );
-  }
-
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Central de Clientes
-        </Typography>
-      </Box>
-
-      {/* Alertas */}
-      {error && (
-        <Alert severity="error" onClose={handleCloseAlert} sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-      {success && (
-        <Alert severity="success" onClose={handleCloseAlert} sx={{ mb: 2 }}>
-          {success}
-        </Alert>
-      )}
-
-      {/* Cards de Estatísticas */}
-      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
-        <Card sx={{ minWidth: 200 }}>
-          <CardContent>
-            <Typography color="text.secondary" gutterBottom>
-              Total de Clientes
-            </Typography>
-            <Typography variant="h4" component="div">
-              {stats.total}
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card sx={{ minWidth: 200 }}>
-          <CardContent>
-            <Typography color="text.secondary" gutterBottom>
-              Clientes Ativos
-            </Typography>
-            <Typography variant="h4" component="div" color="success.main">
-              {stats.ativos}
-            </Typography>
-          </CardContent>
-        </Card>
-        <Card sx={{ minWidth: 200 }}>
-          <CardContent>
-            <Typography color="text.secondary" gutterBottom>
-              Clientes Inativos
-            </Typography>
-            <Typography variant="h4" component="div" color="error.main">
-              {stats.inativos}
-            </Typography>
-          </CardContent>
-        </Card>
-      </Box>
-
-      {/* Controles */}
-      <Paper sx={{ p: 2, mb: 2 }}>
-        <Box sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 2
-        }}>
-          <TextField
-            placeholder="Buscar por nome, CNPJ ou email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{ minWidth: 300 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search />
-                </InputAdornment>
-              ),
-            }}
-          />
-          
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={handleCreate}
-            sx={{ 
-              bgcolor: 'primary.main',
-              '&:hover': { bgcolor: 'primary.dark' }
-            }}
+    <Box sx={{backgroundColor: '#f5f5f5'}}>
+      <Box sx={{ p: 3, minHeight: '100vh', width: '90%', margin: '0 auto', textAlign: 'left' }}>
+        {/* Breadcrumbs */}
+        <Breadcrumbs sx={{ mb: 2 }}>
+          <Link 
+            color="inherit" 
+            href="/home"
+            sx={{ display: 'flex', alignItems: 'center' }}
           >
-            Novo Cliente
-          </Button>
+            <Home sx={{ mr: 0.5 }} fontSize="inherit" />
+            Home
+          </Link>
+          <Typography 
+            color="text.primary"
+            sx={{ display: 'flex', alignItems: 'center' }}
+          >
+            <ContactPage sx={{ mr: 0.5 }} fontSize="inherit" />
+            Central de Clientes
+          </Typography>
+        </Breadcrumbs>
+        {/* Cabeçalho */}
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={6} mt={6}>
+          <Typography variant="h4" component="h1">
+            Central de Clientes
+          </Typography>
+          
+          <Box display="flex" gap={2}>
+            <Button
+              variant="outlined"
+              startIcon={<CloudUpload />}
+              onClick={handleImportacao}
+              sx={{ 
+                borderColor: '#ea580c', 
+                color: '#ea580c',
+                '&:hover': { borderColor: '#c2410c', backgroundColor: '#fed7aa',
+                fontSize: '1rem'
+                }
+              }}
+            >
+              Importar Planilha
+            </Button>
+            
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              onClick={() => router.push('/cliente/cadastro')}
+              sx={{ 
+                backgroundColor: '#ea580c',
+                '&:hover': { backgroundColor: '#c2410c',
+                fontSize: '1rem'
+                 }
+              }}
+            >
+              Novo Cliente
+            </Button>
+          </Box>
         </Box>
-      </Paper>
 
-      {/* Tabela */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                <TableSortLabel
-                  active={sortConfig.field === 'nome_empresa'}
-                  direction={sortConfig.field === 'nome_empresa' ? sortConfig.direction : 'asc'}
-                  onClick={() => handleSort('nome_empresa')}
-                >
-                  Nome da Empresa
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortConfig.field === 'cnpj'}
-                  direction={sortConfig.field === 'cnpj' ? sortConfig.direction : 'asc'}
-                  onClick={() => handleSort('cnpj')}
-                >
-                  CNPJ
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>Contato</TableCell>
-              <TableCell>Telefone</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortConfig.field === 'email'}
-                  direction={sortConfig.field === 'email' ? sortConfig.direction : 'asc'}
-                  onClick={() => handleSort('email')}
-                >
-                  Email
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortConfig.field === 'criado_em'}
-                  direction={sortConfig.field === 'criado_em' ? sortConfig.direction : 'asc'}
-                  onClick={() => handleSort('criado_em')}
-                >
-                  Criado em
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align="center">Ações</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedClientes.map((cliente) => (
-              <TableRow key={cliente.id} hover>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Business color="action" />
-                    <Typography variant="body2" fontWeight="medium">
-                      {cliente.nome_empresa}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" fontFamily="monospace">
-                    {formatCNPJ(cliente.cnpj)}
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  {cliente.contato_nome ? (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Person color="action" />
-                      <Typography variant="body2">
-                        {cliente.contato_nome}
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      -
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {cliente.contato_telefone ? (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Phone color="action" />
-                      <Typography variant="body2">
-                        {formatTelefone(cliente.contato_telefone)}
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      -
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Email color="action" />
-                    <Typography variant="body2">
-                      {cliente.email}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    label={cliente.ativo ? 'Ativo' : 'Inativo'}
-                    color={cliente.ativo ? 'success' : 'error'}
-                    size="small"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2" color="text.secondary">
-                    {formatDate(cliente.created_at)}
-                  </Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Tooltip title="Editar cliente">
-                      <IconButton
-                        size="small"
-                        onClick={() => handleEdit(cliente)}
-                        color="primary"
-                      >
-                        <Edit />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Excluir cliente">
-                      <IconButton
-                        size="small"
-                        onClick={() => handleDelete(cliente)}
-                        color="error"
-                      >
-                        <Delete />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            ))}
-            {paginatedClientes.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={8} align="center">
-                  <Typography variant="body2" color="text.secondary" sx={{ py: 4 }}>
-                    {searchTerm ? 'Nenhum cliente encontrado com os filtros aplicados.' : 'Nenhum cliente cadastrado.'}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        {/* Mensagens de feedback */}
+        {error && (
+          <Alert severity="error" onClose={clearMessages} sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
         
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25, 50]}
-          component="div"
-          count={filteredClientes.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Linhas por página:"
-          labelDisplayedRows={({ from, to, count }) => 
-            `${from}-${to} de ${count !== -1 ? count : `mais de ${to}`}`
-          }
+        {success && (
+          <Alert severity="success" onClose={clearMessages} sx={{ mb: 2 }}>
+            {success}
+          </Alert>
+        )}
+
+        {/* Cards de estatísticas */}
+        <Grid container spacing={3} mb={3}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={3}>
+              <CardContent>
+                <Box display="flex" alignItems="center" justifyContent="space-between">
+                  <Box>
+                    <Typography color="textSecondary" gutterBottom>
+                      Total de Clientes
+                    </Typography>
+                    <Typography variant="h4" component="div">
+                      {stats.total}
+                    </Typography>
+                  </Box>
+                  <Business sx={{ fontSize: 40, color: '#ea580c' }} />
+                </Box>
+              </CardContent>
+            </Paper>
+          </Grid>
+          
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={3}>
+              <CardContent>
+                <Box display="flex" alignItems="center" justifyContent="space-between">
+                  <Box>
+                    <Typography color="textSecondary" gutterBottom>
+                      Clientes Ativos
+                    </Typography>
+                    <Typography variant="h4" component="div" color="success.main">
+                      {stats.ativos}
+                    </Typography>
+                  </Box>
+                  <CheckCircle sx={{ fontSize: 40, color: 'success.main' }} />
+                </Box>
+              </CardContent>
+            </Paper>
+          </Grid>
+          
+          <Grid item xs={12} sm={6} md={3}>
+            <Paper elevation={3}>
+              <CardContent>
+                <Box display="flex" alignItems="center" justifyContent="space-between">
+                  <Box>
+                    <Typography color="textSecondary" gutterBottom>
+                      Clientes Inativos
+                    </Typography>
+                    <Typography variant="h4" component="div" color="error.main">
+                      {stats.inativos}
+                    </Typography>
+                  </Box>
+                  <Cancel sx={{ fontSize: 40, color: 'error.main' }} />
+                </Box>
+              </CardContent>
+            </Paper>
+          </Grid>
+          
+        </Grid>
+
+        {/* Barra de busca e ações */}
+        <Paper elevation={3} sx={{ mb: 3 }}>
+          <CardContent>
+            <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
+              <TextField
+                placeholder="Buscar por nome, CNPJ, email ou contato..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{ flexGrow: 1, maxWidth: 400 }}
+              />
+              
+              <Box display="flex" gap={1}>
+                <Tooltip title="Atualizar lista">
+                  <IconButton onClick={loadClientes} disabled={loading}>
+                    <Refresh />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
+          </CardContent>
+        </Paper>
+
+        {/* Tabela de clientes */}
+        <Paper elevation={3}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Clientes Cadastrados ({clientes.length})
+            </Typography>
+            
+            <TableContainer sx={{ mt: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell><strong>Empresa</strong></TableCell>
+                    <TableCell><strong>CNPJ</strong></TableCell>
+                    <TableCell><strong>Contato</strong></TableCell>
+                    <TableCell><strong>Email</strong></TableCell>
+                    <TableCell><strong>Status</strong></TableCell>
+                    <TableCell><strong>Cadastrado em</strong></TableCell>
+                    <TableCell align="center"><strong>Ações</strong></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">
+                        <Typography>Carregando...</Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : clientes.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} align="center">
+                        <Typography color="textSecondary">
+                          {searchTerm ? 'Nenhum cliente encontrado para a busca.' : 'Nenhum cliente cadastrado.'}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    clientes.map((cliente) => (
+                      <TableRow key={cliente.id} hover>
+                        <TableCell>
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <Business fontSize="small" color="action" />
+                            <Typography variant="body2" fontWeight="medium">
+                              {cliente.nome_empresa}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                        
+                        <TableCell>
+                          <Typography variant="body2" fontFamily="monospace">
+                            {formatCNPJ(cliente.cnpj)}
+                          </Typography>
+                        </TableCell>
+                        
+                        <TableCell>
+                          {cliente.contato_nome && (
+                            <Box>
+                              <Typography variant="body2">
+                                {cliente.contato_nome}
+                              </Typography>
+                              {cliente.contato_telefone && (
+                                <Typography variant="caption" color="textSecondary" display="flex" alignItems="center" gap={0.5}>
+                                  <Phone fontSize="inherit" />
+                                  {formatTelefone(cliente.contato_telefone)}
+                                </Typography>
+                              )}
+                            </Box>
+                          )}
+                        </TableCell>
+                        
+                        <TableCell>
+                          <Box display="flex" alignItems="center" gap={0.5}>
+                            <Email fontSize="small" color="action" />
+                            <Typography variant="body2">
+                              {cliente.email}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                        
+                        <TableCell>
+                          <Chip
+                            label={cliente.ativo ? 'Ativo' : 'Inativo'}
+                            color={cliente.ativo ? 'success' : 'error'}
+                            size="small"
+                            icon={cliente.ativo ? <CheckCircle /> : <Cancel />}
+                          />
+                        </TableCell>
+                        
+                        <TableCell>
+                          <Typography variant="body2">
+                            {formatDate(cliente.created_at)}
+                          </Typography>
+                        </TableCell>
+                        
+                        <TableCell align="center">
+                          <IconButton
+                            size="small"
+                            onClick={(e) => handleOpenMenu(e, cliente.id)}
+                          >
+                            <MoreVert />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+            {/* Paginação */}
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 20, 50]}
+              component="div"
+              count={totalElements}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="Linhas por página:"
+              labelDisplayedRows={({ from, to, count }) => 
+                `${from}-${to} de ${count !== -1 ? count : `mais de ${to}`}`
+              }
+            />
+            
+          </CardContent>
+        </Paper>
+
+        {/* Menu de ações */}
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleCloseMenu}
+        >
+          <MenuItem onClick={() => {
+            const cliente = clientes.find(c => c.id === menuClienteId);
+            if (cliente) handleEditCliente(cliente);
+          }}>
+            <ListItemIcon>
+              <Edit fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Editar</ListItemText>
+          </MenuItem>
+          
+          <MenuItem onClick={() => {
+            const cliente = clientes.find(c => c.id === menuClienteId);
+            if (cliente) handleDeleteCliente(cliente);
+          }}>
+            <ListItemIcon>
+              <Delete fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Excluir</ListItemText>
+          </MenuItem>
+        </Menu>
+
+        {/* Modais */}
+        <ClienteEmpresaModal
+          open={clienteModalOpen}
+          cliente={selectedCliente}
+          onClose={() => setClienteModalOpen(false)}
+          onSave={handleSaveCliente}
+          loading={loading}
+          mode={modalMode}
         />
-      </TableContainer>
 
-      {/* Modais */}
-      <ClienteEmpresaModal
-        open={modalOpen}
-        cliente={selectedCliente}
-        onClose={() => {
-          setModalOpen(false);
-          setSelectedCliente(null);
-        }}
-        onSave={handleSave}
-        loading={actionLoading}
-        mode={modalMode}
-      />
+        <DeleteClienteEmpresaModal
+          open={deleteModalOpen}
+          cliente={selectedCliente}
+          onClose={() => setDeleteModalOpen(false)}
+          onConfirm={handleConfirmDelete}
+          loading={loading}
+        />
 
-      <DeleteClienteEmpresaModal
-        open={deleteModalOpen}
-        cliente={selectedCliente}
-        onClose={() => {
-          setDeleteModalOpen(false);
-          setSelectedCliente(null);
-        }}
-        onConfirm={handleConfirmDelete}
-        loading={actionLoading}
-      />
+        <ImportacaoClientesModal
+          open={importacaoModalOpen}
+          onClose={() => setImportacaoModalOpen(false)}
+          onSuccess={handleImportacaoSuccess}
+        />
+      </Box>
     </Box>
   );
 };
+
+export default CentralClientes;
+

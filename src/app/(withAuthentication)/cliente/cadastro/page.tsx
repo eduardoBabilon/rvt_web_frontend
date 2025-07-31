@@ -18,7 +18,9 @@ import {
   Stepper,
   Step,
   StepLabel,
-  Collapse
+  Collapse,
+  Breadcrumbs,
+  Link
 } from '@mui/material';
 import {
   Business,
@@ -29,7 +31,11 @@ import {
   Cancel,
   CheckCircle,
   Info,
-  Warning
+  Warning,
+  ContactPage,
+  Home,
+  Add,
+  AddCircle
 } from '@mui/icons-material';
 import { 
   ClienteEmpresaFormData, 
@@ -38,14 +44,15 @@ import {
   CLIENTE_EMPRESA_ERROR_MESSAGES,
   formatCNPJ,
   formatTelefone,
+  validateCNPJFormat
 } from '@/types/modules/clienteEmpresa';
 import { 
   createCliente, 
-  validateCNPJ,
-  validateCNPJFormat, 
+  validateCNPJ, 
   validateEmail,
   cleanClienteEmpresaFormData 
 } from '@/service/api/clienteEmpresa/clienteEmpresaService';
+import { useRouter } from 'next/navigation';
 
 const steps = ['Dados da Empresa', 'Informações de Contato', 'Confirmação'];
 
@@ -58,6 +65,8 @@ export default function CadastroCliente({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
+  const router = useRouter();
 
   const [formData, setFormData] = useState<ClienteEmpresaFormData>({
     nome_empresa: '',
@@ -227,21 +236,14 @@ export default function CadastroCliente({
       const newCliente = await createCliente(cleanData);
       
       setSuccess('Cliente cadastrado com sucesso!');
+      setTimeout(() => {
+        router.push('/cliente/central');
+      }, 2000);
       
       // Chamar callback de sucesso se fornecido
       if (onSuccess) {
         onSuccess(newCliente);
       }
-
-      // Reset do formulário
-      setFormData({
-        nome_empresa: '',
-        cnpj: '',
-        contato_nome: '',
-        contato_telefone: '',
-        email: ''
-      });
-      setActiveStep(0);
       
     } catch (err: any) {
       console.error('Erro ao cadastrar cliente:', err);
@@ -288,267 +290,288 @@ export default function CadastroCliente({
   };
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 4, textAlign: 'center' }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Cadastro de Cliente
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Preencha as informações abaixo para cadastrar um novo cliente
-        </Typography>
-      </Box>
-
-      {/* Alertas */}
-      <Collapse in={!!error}>
-        <Alert severity="error" onClose={handleCloseAlert} sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      </Collapse>
-      
-      <Collapse in={!!success}>
-        <Alert severity="success" onClose={handleCloseAlert} sx={{ mb: 2 }}>
-          {success}
-        </Alert>
-      </Collapse>
-
-      {/* Stepper */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Stepper activeStep={activeStep} alternativeLabel>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-        </CardContent>
-      </Card>
-
-      {/* Formulário */}
-      <Card>
-        <CardContent sx={{ p: 4 }}>
-          {/* Step 0: Dados da Empresa */}
-          {activeStep === 0 && (
-            <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <Business sx={{ mr: 1, color: 'primary.main' }} />
-                <Typography variant="h6">Dados da Empresa</Typography>
-              </Box>
-              
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Nome da Empresa"
-                    value={formData.nome_empresa}
-                    onChange={(e) => handleFieldChange('nome_empresa', e.target.value)}
-                    error={!!validationErrors.nome_empresa}
-                    helperText={validationErrors.nome_empresa}
-                    required
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Business />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="CNPJ"
-                    value={formData.cnpj}
-                    onChange={(e) => handleFieldChange('cnpj', e.target.value)}
-                    error={!!validationErrors.cnpj}
-                    helperText={validationErrors.cnpj || 'Formato: XX.XXX.XXX/XXXX-XX'}
-                    required
-                    placeholder="00.000.000/0000-00"
-                    inputProps={{ maxLength: 18 }}
-                  />
-                </Grid>
-              </Grid>
-
-              <Alert severity="info" sx={{ mt: 3 }}>
-                <Typography variant="body2">
-                  <Info sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Certifique-se de que o CNPJ está correto, pois ele será usado para identificar a empresa no sistema.
-                </Typography>
-              </Alert>
-            </Box>
-          )}
-
-          {/* Step 1: Informações de Contato */}
-          {activeStep === 1 && (
-            <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <Person sx={{ mr: 1, color: 'primary.main' }} />
-                <Typography variant="h6">Informações de Contato</Typography>
-              </Box>
-              
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleFieldChange('email', e.target.value)}
-                    error={!!validationErrors.email}
-                    helperText={validationErrors.email}
-                    required
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Email />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Nome do Contato"
-                    value={formData.contato_nome}
-                    onChange={(e) => handleFieldChange('contato_nome', e.target.value)}
-                    error={!!validationErrors.contato_nome}
-                    helperText={validationErrors.contato_nome || 'Opcional'}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Person />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-                
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Telefone do Contato"
-                    value={formData.contato_telefone}
-                    onChange={(e) => handleFieldChange('contato_telefone', e.target.value)}
-                    error={!!validationErrors.contato_telefone}
-                    helperText={validationErrors.contato_telefone || 'Opcional - Formato: (XX) XXXXX-XXXX'}
-                    placeholder="(11) 99999-9999"
-                    inputProps={{ maxLength: 15 }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <Phone />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Grid>
-              </Grid>
-
-              <Alert severity="warning" sx={{ mt: 3 }}>
-                <Typography variant="body2">
-                  <Warning sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  O email será usado para comunicações importantes. Certifique-se de que está correto e ativo.
-                </Typography>
-              </Alert>
-            </Box>
-          )}
-
-          {/* Step 2: Confirmação */}
-          {activeStep === 2 && (
-            <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                <CheckCircle sx={{ mr: 1, color: 'success.main' }} />
-                <Typography variant="h6">Confirmação dos Dados</Typography>
-              </Box>
-              
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Revise as informações antes de finalizar o cadastro:
-              </Typography>
-
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      Dados da Empresa
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Nome:</strong> {formData.nome_empresa}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>CNPJ:</strong> {formatCNPJ(formData.cnpj)}
-                    </Typography>
-                  </Paper>
-                </Grid>
-                
-                <Grid item xs={12}>
-                  <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
-                    <Typography variant="subtitle2" gutterBottom>
-                      Informações de Contato
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Email:</strong> {formData.email}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Contato:</strong> {formData.contato_nome || 'Não informado'}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Telefone:</strong> {formData.contato_telefone ? formatTelefone(formData.contato_telefone) : 'Não informado'}
-                    </Typography>
-                  </Paper>
-                </Grid>
-              </Grid>
-
-              <Alert severity="success" sx={{ mt: 3 }}>
-                <Typography variant="body2">
-                  <CheckCircle sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Dados validados! Clique em "Finalizar Cadastro" para salvar o cliente.
-                </Typography>
-              </Alert>
-            </Box>
-          )}
-        </CardContent>
-
-        <Divider />
-
-        <CardActions sx={{ p: 3, justifyContent: 'space-between' }}>
-          <Button
-            onClick={activeStep === 0 ? handleCancel : handleBack}
-            startIcon={<Cancel />}
-            disabled={loading}
+    <Box sx={{backgroundColor: '#f5f5f5'}}>
+      <Box sx={{ p: 3, width: '90%', margin: '0 auto', textAlign: 'left' }}>
+        {/* Breadcrumbs */}
+        <Breadcrumbs sx={{ mb: 2 }}>
+          <Link 
+            color="inherit" 
+            href="/home"
+            sx={{ display: 'flex', alignItems: 'center' }}
           >
-            {activeStep === 0 ? 'Cancelar' : 'Voltar'}
-          </Button>
+            <Home sx={{ mr: 0.5 }} fontSize="inherit" />
+            Home
+          </Link>
+          <Link 
+            color="inherit" 
+            href="/cliente/central"
+            sx={{ display: 'flex', alignItems: 'center' }}
+          >
+            <ContactPage sx={{ mr: 0.5 }} fontSize="inherit" />
+            Central de Clientes
+          </Link>
+          <Typography 
+            color="text.primary"
+            sx={{ display: 'flex', alignItems: 'center' }}
+          >
+            <AddCircle sx={{ mr: 0.5 }} fontSize="inherit" />
+            Cadastro de Cliente
+          </Typography>
+        </Breadcrumbs>
+        {/* Header */}
+        <Box mb={6} mt={6}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Cadastro de Cliente
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Preencha as informações abaixo para cadastrar um novo cliente
+          </Typography>
+        </Box>
 
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            {activeStep < steps.length - 1 ? (
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                disabled={loading}
-              >
-                Próximo
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={loading}
-                startIcon={loading ? <CircularProgress size={20} /> : <Save />}
-                sx={{ 
-                  bgcolor: 'success.main',
-                  '&:hover': { bgcolor: 'success.dark' }
-                }}
-              >
-                {loading ? 'Salvando...' : 'Finalizar Cadastro'}
-              </Button>
+        {/* Alertas */}
+        <Collapse in={!!error}>
+          <Alert severity="error" onClose={handleCloseAlert} sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        </Collapse>
+        
+        <Collapse in={!!success}>
+          <Alert severity="success" onClose={handleCloseAlert} sx={{ mb: 2 }}>
+            {success}
+          </Alert>
+        </Collapse>
+
+        {/* Stepper */}
+        <Paper elevation={3} sx={{ alignContent: 'center', alignItems: 'center', mb: 3}}>
+          <CardContent>
+            <Stepper activeStep={activeStep} alternativeLabel>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </CardContent>
+        </Paper>
+
+        {/* Formulário */}
+        <Paper elevation={3} sx={{ mb: 3}}>
+          <CardContent sx={{ p: 4 }}>
+            {/* Step 0: Dados da Empresa */}
+            {activeStep === 0 && (
+              <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <Business sx={{ mr: 1, color: 'primary.main' }} />
+                  <Typography variant="h6">Dados da Empresa</Typography>
+                </Box>
+                
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Nome da Empresa"
+                      value={formData.nome_empresa}
+                      onChange={(e) => handleFieldChange('nome_empresa', e.target.value)}
+                      error={!!validationErrors.nome_empresa}
+                      helperText={validationErrors.nome_empresa}
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Business />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="CNPJ"
+                      value={formData.cnpj}
+                      onChange={(e) => handleFieldChange('cnpj', e.target.value)}
+                      error={!!validationErrors.cnpj}
+                      helperText={validationErrors.cnpj || 'Formato: XX.XXX.XXX/XXXX-XX'}
+                      required
+                      placeholder="00.000.000/0000-00"
+                      inputProps={{ maxLength: 18 }}
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
             )}
-          </Box>
-        </CardActions>
-      </Card>
+
+            {/* Step 1: Informações de Contato */}
+            {activeStep === 1 && (
+              <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <Person sx={{ mr: 1, color: 'primary.main' }} />
+                  <Typography variant="h6">Informações de Contato</Typography>
+                </Box>
+                
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleFieldChange('email', e.target.value)}
+                      error={!!validationErrors.email}
+                      helperText={validationErrors.email}
+                      required
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Email />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Nome do Contato"
+                      value={formData.contato_nome}
+                      onChange={(e) => handleFieldChange('contato_nome', e.target.value)}
+                      error={!!validationErrors.contato_nome}
+                      helperText={validationErrors.contato_nome || 'Opcional'}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Person />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Telefone do Contato"
+                      value={formData.contato_telefone}
+                      onChange={(e) => handleFieldChange('contato_telefone', e.target.value)}
+                      error={!!validationErrors.contato_telefone}
+                      helperText={validationErrors.contato_telefone || 'Opcional - Formato: (XX) XXXXX-XXXX'}
+                      placeholder="(11) 99999-9999"
+                      inputProps={{ maxLength: 15 }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Phone />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+
+                <Alert severity="warning" sx={{ mt: 3 }}>
+                  <Typography variant="body2">
+                    <Warning sx={{ mr: 1, verticalAlign: 'middle' }} />
+                    O email será usado para comunicações importantes. Certifique-se de que está correto e ativo.
+                  </Typography>
+                </Alert>
+              </Box>
+            )}
+
+            {/* Step 2: Confirmação */}
+            {activeStep === 2 && (
+              <Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <CheckCircle sx={{ mr: 1, color: 'success.main' }} />
+                  <Typography variant="h6">Confirmação dos Dados</Typography>
+                </Box>
+                
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  Revise as informações antes de finalizar o cadastro:
+                </Typography>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        Dados da Empresa
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Nome:</strong> {formData.nome_empresa}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>CNPJ:</strong> {formatCNPJ(formData.cnpj)}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        Informações de Contato
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Email:</strong> {formData.email}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Contato:</strong> {formData.contato_nome || 'Não informado'}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Telefone:</strong> {formData.contato_telefone ? formatTelefone(formData.contato_telefone) : 'Não informado'}
+                      </Typography>
+                    </Paper>
+                  </Grid>
+                </Grid>
+
+                <Alert severity="success" sx={{ mt: 3 }}>
+                  <Typography variant="body2">
+                    <CheckCircle sx={{ mr: 1, verticalAlign: 'middle' }} />
+                    Dados validados! Clique em "Finalizar Cadastro" para salvar o cliente.
+                  </Typography>
+                </Alert>
+              </Box>
+            )}
+          </CardContent>
+
+          <Divider />
+
+          <CardActions sx={{ p: 3, justifyContent: 'space-between' }}>
+            <Button
+              onClick={activeStep === 0 ? handleCancel : handleBack}
+              startIcon={<Cancel />}
+              disabled={loading}
+            >
+              {activeStep === 0 ? 'Cancelar' : 'Voltar'}
+            </Button>
+
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              {activeStep < steps.length - 1 ? (
+                <Button
+                  variant="contained"
+                  onClick={handleNext}
+                  disabled={loading}
+                >
+                  Próximo
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  startIcon={loading ? <CircularProgress size={20} /> : <Save />}
+                  sx={{ 
+                    bgcolor: 'success.main',
+                    '&:hover': { bgcolor: 'success.dark' }
+                  }}
+                >
+                  {loading ? 'Salvando...' : 'Finalizar Cadastro'}
+                </Button>
+              )}
+            </Box>
+          </CardActions>
+        </Paper>
+      </Box>
     </Box>
   );
 };

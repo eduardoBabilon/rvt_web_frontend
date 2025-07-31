@@ -21,9 +21,9 @@ import {
   CLIENTE_EMPRESA_VALIDATION,
   CLIENTE_EMPRESA_ERROR_MESSAGES,
   formatCNPJ,
-  formatTelefone
+  formatTelefone,
+  validateCNPJFormat
 } from '@/types/modules/clienteEmpresa';
-import { validateCNPJFormat } from '@/service/api/clienteEmpresa/clienteEmpresaService';
 
 const ClienteEmpresaModal: React.FC<ClienteEmpresaModalProps> = ({
   open,
@@ -225,7 +225,7 @@ const ClienteEmpresaModal: React.FC<ClienteEmpresaModalProps> = ({
       </DialogTitle>
 
       <DialogContent sx={{ pt: 3 }}>
-        <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3, padding: 3 }}>
           {/* Nome da Empresa */}
           <TextField
             label="Nome da Empresa"

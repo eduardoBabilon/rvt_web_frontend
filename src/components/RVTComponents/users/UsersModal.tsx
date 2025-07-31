@@ -21,7 +21,7 @@ import {
 import { Close } from '@mui/icons-material';
 import { User, UserFormData, UserFormErrors, Perfil, Filial } from '@/types/modules/users';
 import { perfilService } from '@/service/api/users/perfilService';
-import { filialService } from '@/service/api/users/filialService';
+import { getActiveFiliais } from '@/service/api/filial/filialService';
 
 interface UserModalProps {
   isOpen: boolean;
@@ -44,8 +44,8 @@ export const UserModal: React.FC<UserModalProps> = ({
     name: '',
     email: '',
     username: '',
-    perfilId: '',
-    filialId: '',
+    perfil_id: '',
+    filial_id: '',
     ativo: true,
   });
 
@@ -68,8 +68,8 @@ export const UserModal: React.FC<UserModalProps> = ({
         name: user.name,
         email: user.email,
         username: user.username,
-        perfilId: '', 
-        filialId: '', 
+        perfil_id: '', 
+        filial_id: '', 
         ativo: user.ativo
       });
     } else {
@@ -77,8 +77,8 @@ export const UserModal: React.FC<UserModalProps> = ({
         name: '',
         email: '',
         username: '',
-        perfilId: '',
-        filialId: '',
+        perfil_id: '',
+        filial_id: '',
         ativo: true
       });
     }
@@ -93,20 +93,20 @@ export const UserModal: React.FC<UserModalProps> = ({
       
       const [perfisResponse, filiaisResponse] = await Promise.all([
         perfilService.getAllPerfis(),
-        filialService.getAllFiliais()
+        getActiveFiliais()
       ]);
 
       setPerfis(perfisResponse.data);
       setFiliais(filiaisResponse.data);
 
       if (mode === 'edit' && user) {
-        const perfilEncontrado = perfisResponse.data.find(p => p.perfil === user.perfilNome);
-        const filialEncontrada = filiaisResponse.data.find(f => f.name === user.filialNome);
+        const perfilEncontrado = perfisResponse.data.find(p => p.perfil === user.perfil_nome);
+        const filialEncontrada = filiaisResponse.data.find(f => f.name === user.filial_nome);
 
         setFormData(prev => ({
           ...prev,
-          perfilId: perfilEncontrado?.id || '',
-          filialId: filialEncontrada?.id || ''
+          perfil_id: perfilEncontrado?.id || '',
+          filial_id: filialEncontrada?.id || ''
         }));
       }
     } catch (error) {
@@ -134,12 +134,12 @@ export const UserModal: React.FC<UserModalProps> = ({
       newErrors.username = 'Username é obrigatório';
     }
 
-    if (!formData.perfilId) {
-      newErrors.perfilId = 'Função é obrigatória';
+    if (!formData.perfil_id) {
+      newErrors.perfil_id = 'Função é obrigatória';
     }
 
-    if (!formData.filialId) {
-      newErrors.filialId = 'Filial é obrigatória';
+    if (!formData.filial_id) {
+      newErrors.filial_id = 'Filial é obrigatória';
     }
 
     setErrors(newErrors);
@@ -246,16 +246,16 @@ export const UserModal: React.FC<UserModalProps> = ({
 
             <FormControl 
               fullWidth 
-              error={!!errors.perfilId}
+              error={!!errors.perfil_id}
               disabled={loading}
               required
               sx={{ mb: 2 }}
             >
               <InputLabel>Função</InputLabel>
               <Select
-                value={formData.perfilId}
+                value={formData.perfil_id}
                 label="Função"
-                onChange={(e) => handleInputChange('perfilId', e.target.value)}
+                onChange={(e) => handleInputChange('perfil_id', e.target.value)}
               >
                 {perfis.map((perfil) => (
                   <MenuItem key={perfil.id} value={perfil.id}>
@@ -263,25 +263,25 @@ export const UserModal: React.FC<UserModalProps> = ({
                   </MenuItem>
                 ))}
               </Select>
-              {errors.perfilId && (
+              {errors.perfil_id && (
                 <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
-                  {errors.perfilId}
+                  {errors.perfil_id}
                 </Typography>
               )}
             </FormControl>
 
             <FormControl 
               fullWidth 
-              error={!!errors.filialId}
+              error={!!errors.filial_id}
               disabled={loading}
               required
               sx={{ mb: 2 }}
             >
               <InputLabel>Filial</InputLabel>
               <Select
-                value={formData.filialId}
+                value={formData.filial_id}
                 label="Filial"
-                onChange={(e) => handleInputChange('filialId', e.target.value)}
+                onChange={(e) => handleInputChange('filial_id', e.target.value)}
               >
                 {filiais.map((filial) => (
                   <MenuItem key={filial.id} value={filial.id}>
@@ -289,9 +289,9 @@ export const UserModal: React.FC<UserModalProps> = ({
                   </MenuItem>
                 ))}
               </Select>
-              {errors.filialId && (
+              {errors.filial_id && (
                 <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
-                  {errors.filialId}
+                  {errors.filial_id}
                 </Typography>
               )}
             </FormControl>

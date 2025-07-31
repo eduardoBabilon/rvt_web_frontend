@@ -54,6 +54,7 @@ import {
   cleanContratoFormData 
 } from '@/service/api/contrato/contratoService';
 import { getClientesAtivos } from '@/service/api/clienteEmpresa/clienteEmpresaService';
+import { useRouter } from 'next/navigation';
 
 const steps = ['Seleção do Cliente', 'Dados do Contrato', 'Confirmação'];
 
@@ -77,6 +78,8 @@ export default function CadastroContrato({
     data_fim: '',
     cliente_empresa_id: ''
   });
+
+  const router = useRouter();
 
   // Carregar clientes ativos na inicialização
   useEffect(() => {
@@ -234,22 +237,14 @@ export default function CadastroContrato({
       const newContrato = await createContrato(cleanData);
       
       setSuccess('Contrato cadastrado com sucesso!');
+      setTimeout(() => {
+        router.push('/contrato/central');
+      }, 2000);
       
       // Chamar callback de sucesso se fornecido
       if (onSuccess) {
         onSuccess(newContrato);
       }
-
-      // Reset do formulário
-      setFormData({
-        numero_contrato: '',
-        data_inicio: '',
-        data_fim: '',
-        cliente_empresa_id: ''
-      });
-      setSelectedCliente(null);
-      setActiveStep(0);
-      
     } catch (err: any) {
       console.error('Erro ao cadastrar contrato:', err);
       
@@ -408,7 +403,6 @@ export default function CadastroContrato({
 
               <Alert severity="info" sx={{ mt: 3 }}>
                 <Typography variant="body2">
-                  <Info sx={{ mr: 1, verticalAlign: 'middle' }} />
                   Selecione o cliente para o qual o contrato será criado. Apenas clientes ativos são exibidos.
                 </Typography>
               </Alert>
@@ -497,13 +491,6 @@ export default function CadastroContrato({
                   </Grid>
                 )}
               </Grid>
-
-              <Alert severity="warning" sx={{ mt: 3 }}>
-                <Typography variant="body2">
-                  <Warning sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Certifique-se de que as datas estão corretas. A data de fim deve ser posterior à data de início.
-                </Typography>
-              </Alert>
             </Box>
           )}
 

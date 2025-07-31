@@ -16,11 +16,11 @@ export function SideMenuHeader() {
   const { isAdmin } = user ?? {};
 
   const navigateToHome = () => {
-    if (pathname === '/') {
+    if (pathname === '/home') {
       // Forçar reload da home caso já esteja nela
       router.refresh();
     } else {
-      router.push('/');
+      router.push('/home');
     }
   };
 
@@ -36,31 +36,30 @@ export function SideMenuHeader() {
 
           {/* Botão para Gerar Etiqueta (Home) */}
           <ButtonSideMenu
-            text="RVT"
+            text="Home"
             onClick={navigateToHome}
-            isSelected={pathname === '/'}
+            isSelected={pathname === '/home'}
           />
 
-          {/* Botão para Cadastro de Mangueiras */}
 
-          {/* Botão para Consultar Mangueiras */}
+          {/* Botão para Central de Usuários */}
           <ButtonSideMenu
-            text="Consultar Informações de Modelo"
-            onClick={() => router.push('/bu/infos')}
-            isSelected={pathname === '/bu/infos'}
+            text="Usuários"
+            onClick={() => router.push('/users')}
+            isSelected={pathname === '/users'}
           />
 
           <ButtonSideMenu
-            text="Consultar Listagem Geral"
-            onClick={() => router.push('/listagemGeral')}
-            isSelected={pathname === '/listagemGeral'}
+            text="Clientes"
+            onClick={() => router.push('/cliente/central')}
+            isSelected={pathname === '/cliente/central'}
           />
 
-          {/* <ButtonSideMenu
-            text="Consultar Informações de CO2"
-            onClick={() => router.push('/bu/co2')}
-            isSelected={pathname === '/bu/co2'}
-          /> */}
+          <ButtonSideMenu
+            text="Obras"
+            onClick={() => router.push('/obra/central')}
+            isSelected={pathname === '/obra/central'}
+          />
 
           {/* Botão para Logout */}
           <ButtonSideMenu text="Logout" onClick={logout} />

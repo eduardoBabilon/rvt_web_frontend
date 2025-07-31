@@ -22,7 +22,9 @@ import {
   InputAdornment,
   Tooltip,
   Card,
-  CardContent
+  CardContent,
+  Breadcrumbs,
+  Link
 } from '@mui/material';
 import {
   Add,
@@ -30,12 +32,15 @@ import {
   Edit,
   Delete,
   ArrowUpward,
-  ArrowDownward
+  ArrowDownward,
+  Home,
+  ContactPage,
+  AccountCircle
 } from '@mui/icons-material';
 import { User, UserFormData, UserFilters, PaginationParams, UserPagedResponse } from '@/types/modules/users';
-import { userService } from '@/service/api/users/userService';
 import { UserModal } from '@/components/RVTComponents/users/UsersModal';
 import { DeleteUserModal } from '@/components/RVTComponents/users/DeleteUsersModal';
+import { createUser, deleteUser, getAllUsers, updateUser } from '@/service/api/users/userService';
 
 type SortDirection = 'asc' | 'desc';
 
@@ -87,7 +92,7 @@ export default function Page (){
         sort: `${sortConfig.field},${sortConfig.direction}`
       };
 
-      const response: UserPagedResponse = await userService.getAllUsers(filters, pagination);
+      const response: UserPagedResponse = await getAllUsers(filters, pagination);
       
       setUsers(response.content);
       setTotalElements(response.totalElements);
@@ -163,7 +168,7 @@ export default function Page (){
   const handleCreateUser = async (userData: UserFormData) => {
     try {
       setActionLoading(true);
-      await userService.createUser(userData);
+      await createUser(userData);
       handleCloseModals();
       loadUsers();
     } catch (error) {
@@ -179,7 +184,7 @@ export default function Page (){
 
     try {
       setActionLoading(true);
-      await userService.updateUser(userModal.user.id, userData);
+      await updateUser(userModal.user.id, userData);
       handleCloseModals();
       loadUsers();
     } catch (error) {
@@ -195,7 +200,7 @@ export default function Page (){
 
     try {
       setActionLoading(true);
-      await userService.deleteUser(deleteModal.user.id);
+      await deleteUser(deleteModal.user.id);
       handleCloseModals();
       loadUsers();
     } catch (error) {
@@ -223,218 +228,238 @@ export default function Page (){
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Central de Usuários
-        </Typography>
-      </Box>
+    <Box sx={{backgroundColor: '#f5f5f5', height: '100vh'}}>
+      <Box sx={{ p: 3, width: '90%', margin: '0 auto', textAlign: 'left' }}>
+        {/* Breadcrumbs */}
+        <Breadcrumbs sx={{ mb: 2 }}>
+          <Link 
+            color="inherit" 
+            href="/home"
+            sx={{ display: 'flex', alignItems: 'center' }}
+          >
+            <Home sx={{ mr: 0.5 }} fontSize="inherit" />
+            Home
+          </Link>
+          <Typography 
+            color="text.primary"
+            sx={{ display: 'flex', alignItems: 'center' }}
+          >
+            <AccountCircle sx={{ mr: 0.5 }} fontSize="inherit" />
+            Central de Usuários
+          </Typography>
+        </Breadcrumbs>
+        {/* Header */}
+        <Box display="flex" justifyContent="space-between" mb={3} mt={6}>
+          <Typography variant="h4" component="h1">
+            Central de Usuários
+          </Typography>
+          <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={handleOpenCreateModal}
+                sx={{ 
+                  bgcolor: '#ea580c',
+                  '&:hover': { bgcolor: '#c2410c' }
+                }}
+              >
+                Novo Usuário
+              </Button>
+        </Box>
 
-      {/* Barra de busca e botão novo */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
-            <TextField
-              placeholder="Buscar usuário..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              variant="outlined"
-              size="small"
-              sx={{ flexGrow: 1, maxWidth: 400 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={handleOpenCreateModal}
-              sx={{ 
-                bgcolor: '#ea580c',
-                '&:hover': { bgcolor: '#c2410c' }
-              }}
-            >
-              Novo Registro
-            </Button>
-          </Box>
-        </CardContent>
-      </Card>
+        {/* Barra de busca e botão novo */}
+        <Paper elevation={3} sx={{ mb: 3, width: '100%' }}>
+          <CardContent>
+            <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
+              <TextField
+                placeholder="Buscar usuário..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{ flexGrow: 1, maxWidth: 400 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Box>
+          </CardContent>
+        </Paper>
 
-      {/* Mensagem de erro */}
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-          {error}
-        </Alert>
-      )}
+        {/* Mensagem de erro */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
+            {error}
+          </Alert>
+        )}
 
-      {/* Tabela */}
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer>
-          <Table stickyHeader>
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortConfig.field === 'id'}
-                    direction={sortConfig.field === 'id' ? sortConfig.direction : 'asc'}
-                    onClick={() => handleSort('id')}
-                  >
-                    ID
-                    {renderSortIcon('id')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortConfig.field === 'name'}
-                    direction={sortConfig.field === 'name' ? sortConfig.direction : 'asc'}
-                    onClick={() => handleSort('name')}
-                  >
-                    Nome
-                    {renderSortIcon('name')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortConfig.field === 'email'}
-                    direction={sortConfig.field === 'email' ? sortConfig.direction : 'asc'}
-                    onClick={() => handleSort('email')}
-                  >
-                    Email
-                    {renderSortIcon('email')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>Perfil</TableCell>
-                <TableCell>Filial</TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortConfig.field === 'created_at'}
-                    direction={sortConfig.field === 'created_at' ? sortConfig.direction : 'asc'}
-                    onClick={() => handleSort('created_at')}
-                  >
-                    Criado em
-                    {renderSortIcon('created_at')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell>
-                  <TableSortLabel
-                    active={sortConfig.field === 'updated_at'}
-                    direction={sortConfig.field === 'updated_at' ? sortConfig.direction : 'asc'}
-                    onClick={() => handleSort('updated_at')}
-                  >
-                    Atualizado em
-                    {renderSortIcon('updated_at')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell align="center">Ações</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {loading ? (
+        {/* Tabela */}
+        <Paper elevation={3} sx={{ width: '100%', overflow: 'hidden' }}>
+          <TableContainer>
+            <Table stickyHeader>
+              <TableHead>
                 <TableRow>
-                  <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
-                    <CircularProgress />
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      Carregando usuários...
-                    </Typography>
+                  <TableCell>
+                    <TableSortLabel
+                      active={sortConfig.field === 'id'}
+                      direction={sortConfig.field === 'id' ? sortConfig.direction : 'asc'}
+                      onClick={() => handleSort('id')}
+                    >
+                      ID
+                      {renderSortIcon('id')}
+                    </TableSortLabel>
                   </TableCell>
-                </TableRow>
-              ) : users.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Nenhum usuário encontrado
-                    </Typography>
+                  <TableCell>
+                    <TableSortLabel
+                      active={sortConfig.field === 'name'}
+                      direction={sortConfig.field === 'name' ? sortConfig.direction : 'asc'}
+                      onClick={() => handleSort('name')}
+                    >
+                      Nome
+                      {renderSortIcon('name')}
+                    </TableSortLabel>
                   </TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={sortConfig.field === 'email'}
+                      direction={sortConfig.field === 'email' ? sortConfig.direction : 'asc'}
+                      onClick={() => handleSort('email')}
+                    >
+                      Email
+                      {renderSortIcon('email')}
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell>Perfil</TableCell>
+                  <TableCell>Filial</TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={sortConfig.field === 'created_at'}
+                      direction={sortConfig.field === 'created_at' ? sortConfig.direction : 'asc'}
+                      onClick={() => handleSort('created_at')}
+                    >
+                      Criado em
+                      {renderSortIcon('created_at')}
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell>
+                    <TableSortLabel
+                      active={sortConfig.field === 'updated_at'}
+                      direction={sortConfig.field === 'updated_at' ? sortConfig.direction : 'asc'}
+                      onClick={() => handleSort('updated_at')}
+                    >
+                      Atualizado em
+                      {renderSortIcon('updated_at')}
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell align="center">Ações</TableCell>
                 </TableRow>
-              ) : (
-                users.map((user) => (
-                  <TableRow key={user.id} hover>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                        {user.id.substring(0, 8)}...
+              </TableHead>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                      <CircularProgress />
+                      <Typography variant="body2" sx={{ mt: 1 }}>
+                        Carregando usuários...
                       </Typography>
-                    </TableCell>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.perfilNome}</TableCell>
-                    <TableCell>{user.filialNome}</TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {new Date(user.created_at).toLocaleDateString('pt-BR')}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {new Date(user.updated_at).toLocaleDateString('pt-BR')}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box display="flex" gap={1}>
-                        <Tooltip title="Editar">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleOpenEditModal(user)}
-                            color="primary"
-                          >
-                            <Edit fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Excluir">
-                          <IconButton
-                            size="small"
-                            onClick={() => handleOpenDeleteModal(user)}
-                            color="error"
-                          >
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                ) : users.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        Nenhum usuário encontrado
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  users.map((user) => (
+                    <TableRow key={user.id} hover>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                          {user.id.substring(0, 8)}...
+                        </Typography>
+                      </TableCell>
+                      <TableCell>{user.name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.perfil_nome}</TableCell>
+                      <TableCell>{user.filial_nome}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {new Date(user.created_at).toLocaleDateString('pt-BR')}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {new Date(user.updated_at).toLocaleDateString('pt-BR')}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Box display="flex" gap={1}>
+                          <Tooltip title="Editar">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleOpenEditModal(user)}
+                              color="primary"
+                            >
+                              <Edit fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Excluir">
+                            <IconButton
+                              size="small"
+                              onClick={() => handleOpenDeleteModal(user)}
+                              color="error"
+                            >
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-        {/* Paginação */}
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 20, 50]}
-          component="div"
-          count={totalElements}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Linhas por página:"
-          labelDisplayedRows={({ from, to, count }) => 
-            `${from}-${to} de ${count !== -1 ? count : `mais de ${to}`}`
-          }
+          {/* Paginação */}
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 20, 50]}
+            component="div"
+            count={totalElements}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Linhas por página:"
+            labelDisplayedRows={({ from, to, count }) => 
+              `${from}-${to} de ${count !== -1 ? count : `mais de ${to}`}`
+            }
+          />
+        </Paper>
+
+        {/* Modais */}
+        <UserModal
+          isOpen={userModal.isOpen}
+          mode={userModal.mode}
+          user={userModal.user}
+          onClose={handleCloseModals}
+          onSubmit={handleSubmitModal}
+          loading={actionLoading}
         />
-      </Paper>
 
-      {/* Modais */}
-      <UserModal
-        isOpen={userModal.isOpen}
-        mode={userModal.mode}
-        user={userModal.user}
-        onClose={handleCloseModals}
-        onSubmit={handleSubmitModal}
-        loading={actionLoading}
-      />
-
-      <DeleteUserModal
-        isOpen={deleteModal.isOpen}
-        user={deleteModal.user}
-        onClose={handleCloseModals}
-        onConfirm={handleDeleteUser}
-        loading={actionLoading}
-      />
+        <DeleteUserModal
+          isOpen={deleteModal.isOpen}
+          user={deleteModal.user}
+          onClose={handleCloseModals}
+          onConfirm={handleDeleteUser}
+          loading={actionLoading}
+        />
+      </Box>
     </Box>
   );
 };

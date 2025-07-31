@@ -177,7 +177,7 @@ export const apiRoutes = {
 
   getObraByFilial: {
     method: 'GET',
-    uri: '/obras/filial/{filialId}',
+    uri: '/obras/filial/{filial_id}',
     listenHeaders: ['Authorization'],
   },
 
